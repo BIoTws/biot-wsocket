@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        button {
+            border: 1px solid #ccc;
+            padding: 7px 20px;
+            margin-bottom: 7px;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <div>Commands:
+        <div>
+            <button onclick="getWallets()">Get wallets</button>
+        </div>
+        <div>
+            <button onclick="subscribeText()">Subscribe text</button>
+        </div>
+        <div>
+            <button onclick="startChannel()">start channel</button>
+        </div>
+    </div>
+
+    <div id="outputs" style="margin-top: 100px">
+
+    </div>
+</div>
+<script>
+	var socket = new WebSocket("ws://127.0.0.1:3303");
+	var i = 0;
+	var outputs = document.getElementById('outputs');
+
+	var wallet;
+	var peerDeviceAddress = '0N4HI7LS3PIJ454CEW7TJHODYMYRPXYSM';
+
+	socket.onopen = function () {
+		outputs.innerHTML = 'Connected!';
+	};
+
+	socket.onmessage = function (event) {
+		let data = JSON.parse(event.data);
+		if (data.status === -2) {
+			outputs.innerHTML = outputs.innerHTML + '<br>Subscribe: ' + JSON.stringify(data);
+			return;
+		}
+		console.log('Data', event.data);
+		outputs.innerHTML = 'Response: ' + JSON.stringify(data);
+		if (data.name === 'getMyDeviceWallets') {
+			wallet = data.result[0];
+			console.log('Wallet:', wallet);
+
+			socket.send(JSON.stringify({
+				id: i++,
+				name: 'newChannel',
+				args: [{
+					walletId: wallet,
+					peerDeviceAddress,
+					peerAddress: null,
+					myAmount: 100,
+					peerAmount: 100,
+					age: 10
+				}]
+			}));
+		}
+	};
+
+	socket.onerror = function (error) {
+		alert("Error " + error.message);
+	};
+
+	function getWallets() {
+		socket.send(JSON.stringify({
+			id: i++,
+			name: 'getWallets',
+			args: []
+		}));
+	}
+
+	function subscribeText() {
+		socket.send(JSON.stringify({
+			id: i++,
+			name: 'subscribe',
+			args: ['paired']
+		}));
+		socket.send(JSON.stringify({
+			id: i++,
+			name: 'subscribe',
+			args: ['text']
+		}));
+	}
+
+	function startChannel() {
+		socket.send(JSON.stringify({
+			id: i++,
+			name: 'getMyDeviceWallets',
+			args: []
+		}));
+	}
+</script>
+</body>
+</html>

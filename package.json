@@ -1,0 +1,12 @@
+{
+  "name": "biot-wsocket",
+  "version": "1.0.0",
+  "main": "./server.js",
+  "dependencies": {
+    "ws": "^5.2.1",
+    "biot-core": "git+https://github.com/BIoTws/biot-core.git"
+  },
+  "devDependencies": {
+    "biot-wsclient": "git+https://github.com/BIoTws/biot-wsclient.git"
+  }
+}
