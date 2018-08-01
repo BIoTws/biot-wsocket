@@ -44,7 +44,7 @@
 
 	socket.onmessage = function (event) {
 		let data = JSON.parse(event.data);
-		if (data.status === -2) {
+		if (data.id === -2) {
 			outputs.innerHTML = outputs.innerHTML + '<br>Subscribe: ' + JSON.stringify(data);
 			return;
 		}
